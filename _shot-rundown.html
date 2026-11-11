@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    html, body { margin: 0; padding: 0; background: #efeee7; overflow: hidden; }
+    iframe { display: block; width: 390px; height: 844px; border: 0; }
+  </style>
+</head>
+<body>
+  <iframe id="app"></iframe>
+  <script>
+    const now = Date.now();
+    const today = (() => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    })();
+
+    localStorage.setItem('mananotes.v3', JSON.stringify({
+      version: 3,
+      collections: [{
+        id: 'c1', title: 'Biologi', subtitle: 'Notes & Tasks', theme: 'ocean',
+        createdAt: now, notes: []
+      }]
+    }));
+    localStorage.setItem('mananotes.rundown.v1', JSON.stringify({
+      version: 1,
+      items: [
+        { id: 'r1', date: today, start: '08:00', end: '09:00', title: 'Sarapan & review', note: 'Ulang kartu kemarin', createdAt: now, updatedAt: now },
+        { id: 'r2', date: today, start: '10:00', end: '', title: 'Kelas biologi', note: '', createdAt: now + 1, updatedAt: now + 1 },
+        { id: 'r3', date: today, start: '19:00', end: '20:30', title: 'Belajar biologi', note: 'Bab 3 dan latihan soal', createdAt: now + 2, updatedAt: now + 2 }
+      ]
+    }));
+    localStorage.setItem('mananotes.tutorial.v1', '1');
+    document.getElementById('app').src = '/';
+  </script>
+</body>
+</html>

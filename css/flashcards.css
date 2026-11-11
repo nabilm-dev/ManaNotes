@@ -1,0 +1,745 @@
+﻿/* =========================================================
+   Flashcard — deck grid
+   ========================================================= */
+
+.fc-deck-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding-bottom: 48px;
+}
+
+.fc-deck-card {
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+
+.fc-deck-card:hover,
+.fc-deck-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 44px -18px rgba(0, 0, 0, 0.5);
+}
+
+.fc-deck-cover {
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.fc-deck-cover-top {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.fc-deck-panel {
+  flex: 1;
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fc-deck-panel h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.fc-deck-stats {
+  display: flex;
+  gap: 18px;
+}
+
+.fc-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+
+.fc-stat-n {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.fc-easy-n {
+  color: var(--ok);
+}
+
+.fc-hard-n {
+  color: var(--danger);
+}
+
+.fc-stat span:last-child {
+  font-size: 9.5px;
+  color: var(--faint);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fc-deck-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* =========================================================
+   Flashcard — card list (deck detail)
+   ========================================================= */
+
+.fc-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 48px;
+}
+
+.fc-card-row {
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: border-color 0.15s;
+}
+
+.fc-card-row:hover {
+  border-color: var(--line);
+}
+
+.fc-card-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-card-row-q {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.fc-card-row-a {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.fc-card-row-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.fc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #2a2a28;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.fc-chip-easy {
+  background: rgba(110, 231, 168, 0.12);
+  color: var(--ok);
+}
+
+.fc-chip-medium {
+  background: rgba(255, 177, 92, 0.12);
+  color: var(--accent-2);
+}
+
+.fc-chip-hard {
+  background: rgba(255, 106, 97, 0.12);
+  color: var(--danger);
+}
+
+/* =========================================================
+   Flashcard — practice modal
+   ========================================================= */
+
+.fc-modal {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  background: var(--shell);
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.fc-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.fc-modal::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.fc-modal-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.fc-modal-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.fc-modal-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.fc-title-deck {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.fc-timer {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-timer .ico {
+  width: 14px;
+  height: 14px;
+  color: var(--faint);
+}
+
+.fc-modal-subbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.fc-level-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 177, 92, 0.22);
+  background: rgba(255, 177, 92, 0.08);
+  color: var(--accent-2);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.fc-level-chip .ico {
+  width: 12px;
+  height: 12px;
+}
+
+.fc-progress-fraction {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-progress-fraction span {
+  color: var(--text);
+}
+
+.fc-modal-progress {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.fc-progress-bar {
+  height: 4px;
+  border-radius: 99px;
+  background: #2a2a28;
+  overflow: hidden;
+}
+
+.fc-progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 99px;
+  transition: width 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+.fc-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 24px 30px;
+  gap: 18px;
+  overflow-y: auto;
+}
+
+/* =========================================================
+   Flashcard — the card itself (flip effect)
+   ========================================================= */
+
+/* Stacked deck effect */
+
+.fc-stack-container {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  padding-bottom: 20px;
+}
+
+.fc-stack-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(100% - 20px);
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: linear-gradient(145deg, #242423 0%, #1b1b1a 100%);
+  pointer-events: none;
+}
+
+.fc-stack-layer.layer-1 {
+  transform: translateY(10px) scale(0.975);
+  opacity: 0.75;
+}
+
+.fc-stack-layer.layer-2 {
+  transform: translateY(20px) scale(0.95);
+  opacity: 0.45;
+}
+
+.fc-card-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 620px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.fc-card-wrap.fc-slide-out {
+  animation: fcSlideOut 0.2s ease forwards;
+}
+
+@keyframes fcSlideOut {
+  to {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+.fc-card {
+  width: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+  min-height: 260px;
+  border-radius: 22px;
+}
+
+.fc-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.fc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 32px;
+  min-height: 260px;
+}
+
+.fc-front {
+  background: linear-gradient(145deg, #3a5bff 0%, #2244dd 100%);
+  box-shadow: 0 20px 50px -20px rgba(58, 91, 255, 0.5);
+}
+
+.fc-back {
+  background: linear-gradient(145deg, #1e1e1d 0%, #161615 100%);
+  border: 1px solid var(--line);
+  transform: rotateY(180deg);
+}
+
+.fc-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  align-self: flex-start;
+}
+
+.fc-front .fc-label {
+  color: rgba(255,255,255,0.75);
+}
+
+.fc-back .fc-label {
+  color: var(--faint);
+}
+
+.fc-text {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  line-height: 1.35;
+  color: #fff;
+  width: 100%;
+}
+
+.fc-back .fc-text {
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.fc-tap-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+/* Speaker / TTS */
+
+.fc-tts-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.fc-tts-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.06);
+}
+
+.fc-tts-btn:active {
+  transform: scale(0.94);
+}
+
+.fc-tts-btn .ico {
+  width: 16px;
+  height: 16px;
+}
+
+.fc-back .fc-tts-btn {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--muted);
+}
+
+.fc-back .fc-tts-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #3b3b38;
+  color: var(--text);
+}
+
+/* Example / context collapsible */
+
+.fc-context-card {
+  width: 100%;
+  max-width: 620px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel-soft);
+  overflow: hidden;
+}
+
+.fc-context-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s, background 0.15s;
+}
+
+.fc-context-toggle:hover {
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text);
+}
+
+.fc-context-toggle .ico {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  color: var(--faint);
+}
+
+.fc-context-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.fc-chevron {
+  transition: transform 0.2s ease;
+}
+
+.fc-context-toggle[aria-expanded="true"] .fc-chevron {
+  transform: rotate(180deg);
+}
+
+.fc-context-body {
+  padding: 0 16px 14px;
+}
+
+.fc-context-body p {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+/* =========================================================
+   Flashcard — rating buttons
+   ========================================================= */
+
+.fc-rating {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 620px;
+}
+
+.fc-rate-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, color 0.15s;
+  min-width: 90px;
+}
+
+.fc-rate-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text);
+}
+
+.fc-hard:hover {
+  background: rgba(255, 106, 97, 0.1);
+  border-color: rgba(255, 106, 97, 0.35);
+  color: var(--danger);
+}
+
+.fc-medium:hover {
+  background: rgba(255, 177, 92, 0.1);
+  border-color: rgba(255, 177, 92, 0.35);
+  color: var(--accent-2);
+}
+
+.fc-easy:hover {
+  background: rgba(110, 231, 168, 0.1);
+  border-color: rgba(110, 231, 168, 0.35);
+  color: var(--ok);
+}
+
+.fc-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* =========================================================
+   Flashcard — result screen
+   ========================================================= */
+
+.fc-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 12px 20px;
+}
+
+.fc-result-emoji {
+  font-size: 56px;
+  line-height: 1;
+}
+
+.fc-result h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.fc-result p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.fc-result-breakdown {
+  display: flex;
+  gap: 24px;
+  margin: 8px 0;
+}
+
+.fc-rb-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--faint);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fc-rb-item span {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.fc-result-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* =========================================================
+   Flashcard — card edit dialog textarea
+   ========================================================= */
+
+.field textarea {
+  width: 100%;
+  background: #1a1a19;
+  border: 1px solid #2c2c2a;
+  border-radius: 11px;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 10px 13px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  line-height: 1.6;
+}
+
+.field textarea:focus {
+  border-color: rgba(255, 177, 92, 0.45);
+  box-shadow: 0 0 0 3px rgba(255, 106, 24, 0.1);
+}
+

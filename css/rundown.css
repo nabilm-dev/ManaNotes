@@ -1,0 +1,505 @@
+/* =========================================================
+   Rundown — agenda harian + kalender bulanan (Beranda)
+   ========================================================= */
+
+.rundown {
+  position: relative;
+  margin-bottom: 30px;
+  padding: 22px 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(700px 220px at 12% -30%, rgba(255, 177, 92, 0.08), transparent 65%),
+    var(--panel-soft);
+  overflow: hidden;
+}
+
+.rundown-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.rundown-head .eyebrow {
+  margin-bottom: 6px;
+}
+
+.rundown-head h2 {
+  margin: 0 0 5px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.rundown-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.rundown-head .btn {
+  height: 38px;
+  padding: 0 15px;
+  font-size: 11.5px;
+  flex: 0 0 auto;
+}
+
+.rundown-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 18px;
+  align-items: start;
+}
+
+/* =========================================================
+   Calendar
+   ========================================================= */
+
+.rd-cal {
+  padding: 13px 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #171716;
+}
+
+.rd-cal-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.rd-cal-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rd-month-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  border-color: var(--line-soft);
+  background: #131312;
+}
+
+.rd-month-btn .ico {
+  width: 14px;
+  height: 14px;
+}
+
+.rd-today-btn {
+  height: 28px;
+  padding: 0 10px;
+  margin-left: 2px;
+  border-radius: 9px;
+  font-size: 10.5px;
+}
+
+.rd-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+  padding: 4px 0 6px;
+}
+
+.rd-weekdays span {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.rd-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.rd-day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  min-height: 30px;
+  padding: 0 0 4px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.rd-day:hover {
+  background: #242423;
+}
+
+.rd-day-num {
+  line-height: 1;
+}
+
+.rd-day-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.rd-day-dots i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+
+.rd-day.is-outside {
+  color: var(--faint);
+  opacity: 0.55;
+}
+
+.rd-day.is-today {
+  border-color: rgba(255, 177, 92, 0.45);
+}
+
+.rd-day.is-selected {
+  background: var(--cream);
+  border-color: var(--cream);
+  color: #171614;
+}
+
+.rd-day.is-selected:hover {
+  background: #ffffff;
+}
+
+.rd-day.is-selected .rd-day-dots i {
+  background: #171614;
+  opacity: 0.6;
+}
+
+/* =========================================================
+   Selected day panel
+   ========================================================= */
+
+.rd-day-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100%;
+  padding: 2px 0 0;
+}
+
+.rd-day-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rd-day-head .eyebrow {
+  margin-bottom: 5px;
+  font-size: 9px;
+}
+
+.rd-day-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.rd-day-add {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  flex: 0 0 auto;
+}
+
+.rd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 262px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.rd-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rd-list::-webkit-scrollbar-thumb {
+  background: #2c2c2a;
+  border-radius: 99px;
+}
+
+.rd-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 1px solid var(--line-soft);
+  border-radius: 13px;
+  background: #1a1a19;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.rd-item:hover {
+  background: #212120;
+  border-color: #3a3a37;
+  transform: translateY(-1px);
+}
+
+.rd-time {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  background: #131312;
+  color: var(--accent-2);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.rd-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rd-item-body strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.rd-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.rd-item-body small {
+  flex: 1;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rd-pencil {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  color: var(--faint);
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.rd-item:hover .rd-pencil,
+.rd-item:focus-visible .rd-pencil {
+  opacity: 1;
+  color: var(--muted);
+}
+
+.rd-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  min-height: 170px;
+  padding: 22px 18px;
+  border: 1px dashed #33332f;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.rd-empty p {
+  margin: 0;
+  color: var(--faint);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+.rd-empty .btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 10.5px;
+}
+
+/* =========================================================
+   Dashboard section heading (above collection grid)
+   ========================================================= */
+
+.dashboard-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+}
+
+.dashboard-section-head .eyebrow {
+  margin-bottom: 5px;
+  font-size: 9px;
+}
+
+.dashboard-section-head h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* =========================================================
+   Rundown dialog
+   ========================================================= */
+
+.rundown-dialog {
+  width: min(480px, calc(100vw - 32px));
+}
+
+.rundown-time-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.rundown-time-row input {
+  width: 100%;
+  min-width: 0;
+}
+
+.rundown-time-sep {
+  color: var(--faint);
+  font-size: 12px;
+  user-select: none;
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .rundown-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .rd-list {
+    max-height: none;
+  }
+
+  .rd-day-panel {
+    padding-bottom: 2px;
+  }
+
+  .rd-empty {
+    min-height: 130px;
+  }
+}
+
+@media (max-width: 560px) {
+  .rundown {
+    padding: 18px 16px 20px;
+    border-radius: 22px;
+    margin-bottom: 24px;
+  }
+
+  .rundown-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .rundown-head .btn {
+    width: 100%;
+  }
+
+  .rundown-head h2 {
+    font-size: 20px;
+  }
+
+  .rd-cal {
+    padding: 11px 10px 13px;
+    border-radius: 16px;
+  }
+
+  .rd-cal-title {
+    font-size: 12px;
+  }
+
+  .rd-day {
+    min-height: 32px;
+    border-radius: 9px;
+    font-size: 12px;
+  }
+
+  .rd-item {
+    padding: 9px;
+  }
+
+  .rd-time {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  .rd-pencil {
+    opacity: 1;
+  }
+
+  .dashboard-section-head h2 {
+    font-size: 18px;
+  }
+
+  .rundown-dialog {
+    width: calc(100vw - 20px);
+  }
+
+  .rundown-dialog form {
+    padding: 20px 18px;
+  }
+}

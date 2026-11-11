@@ -1,0 +1,470 @@
+﻿/* =========================================================
+   Collection modal
+   ========================================================= */
+
+.modal {
+  width: min(464px, calc(100vw - 32px));
+  margin: auto;
+  padding: 0;
+  border: 1px solid #363633;
+  border-radius: 26px;
+  background: #171716;
+  color: var(--text);
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.65);
+  overflow: visible;
+}
+
+.modal[open] {
+  animation: modal-pop 0.24s ease both;
+}
+
+.modal form {
+  padding: 24px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-head .eyebrow {
+  margin-bottom: 5px;
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.field label,
+.field-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.field input {
+  height: 43px;
+  padding: 0 12px;
+  border: 1px solid #31312e;
+  border-radius: 11px;
+  outline: 0;
+  background: #131312;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12.5px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field input:focus {
+  border-color: rgba(255, 177, 92, 0.45);
+  box-shadow: 0 0 0 3px rgba(255, 106, 24, 0.09);
+}
+
+.field input::placeholder {
+  color: #57544f;
+}
+
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.theme-swatch {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, var(--c3), transparent 48%),
+    linear-gradient(140deg, var(--c1), var(--c2));
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.theme-swatch::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 2px solid #171716;
+}
+
+.theme-swatch:hover {
+  transform: scale(1.07);
+}
+
+.theme-swatch.is-active {
+  border-color: var(--cream);
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.modal-actions .btn {
+  height: 38px;
+  padding: 0 14px;
+  font-size: 11.5px;
+}
+
+/* =========================================================
+   Tutorial
+   ========================================================= */
+
+.tutorial {
+  width: min(548px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid #3a3a36;
+  border-radius: 28px;
+  background: #171716;
+  color: var(--text);
+  overflow: hidden;
+  box-shadow: 0 40px 110px -22px rgba(0, 0, 0, 0.7);
+}
+
+.tutorial[open] {
+  display: flex;
+  flex-direction: column;
+  animation: modal-pop 0.26s ease both;
+}
+
+.tutorial::backdrop {
+  background: rgba(30, 25, 18, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.tutorial-art {
+  position: relative;
+  flex: 0 0 auto;
+  height: 128px;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 120% at 18% 18%, #ffc46b, transparent 62%),
+    radial-gradient(55% 120% at 82% 8%, #ff7a18, transparent 62%),
+    radial-gradient(80% 140% at 56% 118%, #c81e00, transparent 66%),
+    linear-gradient(135deg, #2a0800, #7a1400 62%, #2a0800);
+}
+
+.tutorial-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--noise);
+  opacity: 0.26;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.tutorial-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 40%, rgba(23, 23, 22, 0.45)),
+    linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, 0.22) 47%, transparent 58%);
+  pointer-events: none;
+}
+
+.tutorial-mark {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(20, 14, 10, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.tutorial-spark {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.tutorial-body {
+  padding: 24px 26px 2px;
+  overflow-y: auto;
+}
+
+.tutorial-body .eyebrow {
+  margin-bottom: 7px;
+}
+
+.tutorial-body h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.tutorial-sub {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tutorial-steps {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 15px;
+}
+
+.tutorial-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.step-num {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid #33332f;
+  background: #1e1e1d;
+  color: var(--accent-2);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tutorial-steps strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.tutorial-steps p {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.tutorial-steps b {
+  color: #d8d4cc;
+  font-weight: 600;
+}
+
+.tutorial-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 14px 0 16px;
+  border-top: 1px solid #262624;
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+
+.tutorial-note .local-dot {
+  margin-top: 4px;
+}
+
+.tutorial-note > span:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.tutorial-note b {
+  color: #b6b2aa;
+  font-weight: 600;
+}
+
+.tutorial-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 4px 26px 22px;
+}
+
+.tutorial-actions .btn {
+  height: 40px;
+  font-size: 12px;
+}
+
+/* =========================================================
+   Toast
+   ========================================================= */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px 12px 18px;
+  border: 1px solid #363633;
+  border-radius: 13px;
+  background: #1e1e1c;
+  color: var(--text);
+  font-size: 12px;
+  box-shadow: 0 22px 50px -14px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 14px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.toast button {
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-2);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toast button:hover {
+  background: rgba(255, 177, 92, 0.1);
+}
+
+/* =========================================================
+   Theme palettes
+   ========================================================= */
+
+.theme-ember {
+  --c1: #ff7a18;
+  --c2: #c81e00;
+  --c3: #ffc46b;
+  --base-1: #2a0800;
+  --base-2: #7a1400;
+}
+
+.theme-ocean {
+  --c1: #38bdf8;
+  --c2: #1d4ed8;
+  --c3: #7dd3fc;
+  --base-1: #03111f;
+  --base-2: #0b3b6b;
+}
+
+.theme-violet {
+  --c1: #a855f7;
+  --c2: #6d28d9;
+  --c3: #f0abfc;
+  --base-1: #160526;
+  --base-2: #4c1d95;
+}
+
+.theme-lime {
+  --c1: #a3e635;
+  --c2: #15803d;
+  --c3: #fde047;
+  --base-1: #0c1a05;
+  --base-2: #2e5a13;
+}
+
+.theme-rose {
+  --c1: #fb7185;
+  --c2: #be123c;
+  --c3: #fda4af;
+  --base-1: #23060c;
+  --base-2: #7f1032;
+}
+
+.theme-amber {
+  --c1: #fbbf24;
+  --c2: #b45309;
+  --c3: #fde68a;
+  --base-1: #1f1203;
+  --base-2: #78350f;
+}
+
+.dot {
+  background:
+    radial-gradient(circle at 30% 28%, var(--c3), transparent 50%),
+    linear-gradient(140deg, var(--c1), var(--c2));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* =========================================================
+   Animations
+   ========================================================= */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+

@@ -11,7 +11,15 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/collections.css" />
+  <link rel="stylesheet" href="css/todo.css" />
+  <link rel="stylesheet" href="css/editor.css" />
+  <link rel="stylesheet" href="css/overlays.css" />
+  <link rel="stylesheet" href="css/flashcards.css" />
+  <link rel="stylesheet" href="css/rundown.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body>
   <div class="shell">
@@ -451,6 +459,54 @@
     </form>
   </dialog>
 
-  <script src="app.js"></script>
+  <!-- Rundown Add/Edit Dialog -->
+  <dialog class="modal rundown-dialog" id="rundown-dialog" aria-label="Rundown harian">
+    <form id="rundown-form">
+      <header class="modal-head">
+        <div>
+          <span class="eyebrow">Rundown harian</span>
+          <h3 id="rundown-dialog-title">Rundown baru</h3>
+        </div>
+        <button class="icon-btn" id="rundown-close" type="button" aria-label="Tutup">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="field">
+        <label for="rundown-title">Judul</label>
+        <input id="rundown-title" type="text" placeholder="Misal: Rapat tim" maxlength="80" required autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="rundown-date">Tanggal</label>
+        <input id="rundown-date" type="date" required />
+      </div>
+
+      <div class="field">
+        <span class="field-label">Waktu (opsional)</span>
+        <div class="rundown-time-row">
+          <input id="rundown-start" type="time" aria-label="Jam mulai" />
+          <span class="rundown-time-sep" aria-hidden="true">–</span>
+          <input id="rundown-end" type="time" aria-label="Jam selesai" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="rundown-note">Catatan (opsional)</label>
+        <textarea id="rundown-note" rows="2" maxlength="300" placeholder="Detail singkat agenda ini..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="rundown-delete" type="button" hidden>Hapus</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost" id="rundown-cancel" type="button">Batal</button>
+        <button class="btn btn-primary" type="submit">Simpan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
