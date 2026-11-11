@@ -5,7 +5,9 @@
      Constants & helpers
      ========================================================= */
 
-  const STORAGE_KEY = 'mananotes.v2';
+  const STORAGE_KEY = 'mananotes.v3';
+  const FC_STORAGE_KEY = 'mananotes.flashcards.v1';
+  const TUTORIAL_KEY = 'mananotes.tutorial.v1';
   const THEMES = ['ember', 'ocean', 'violet', 'lime', 'rose', 'amber'];
   const THEME_LABELS = {
     ember: 'Ember',
@@ -43,6 +45,9 @@
     '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9L12 3.5Z"/><path d="M18.5 15.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9.9-2.1Z"/></svg>';
   const ARROW_LEFT_SVG =
     '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+
+  const CARDS_SVG =
+    '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="14" rx="3.5"/><path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h7A1.5 1.5 0 0 1 17 4.5V6"/><path d="M12 10v4M10 12h4"/></svg>';
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -122,9 +127,45 @@
     collectionSubtitle: $('#collection-subtitle'),
     themePicker: $('#theme-picker'),
     collectionDelete: $('#collection-delete'),
+    helpBtn: $('#btn-help'),
+    tutorialDialog: $('#tutorial-dialog'),
+    tutorialStart: $('#tutorial-start'),
     toast: $('#toast'),
     toastText: $('#toast-text'),
     toastAction: $('#toast-action'),
+    viewFlashcard: $('#view-flashcard'),
+    fcModal: $('#fc-modal'),
+    fcClose: $('#fc-close'),
+    fcDeckName: $('#fc-deck-name'),
+    fcCurrent: $('#fc-current'),
+    fcTotal: $('#fc-total'),
+    fcProgressFill: $('#fc-progress-fill'),
+    fcCard: $('#fc-card'),
+    fcCardWrap: $('#fc-card-wrap'),
+    fcFrontText: $('#fc-front-text'),
+    fcBackText: $('#fc-back-text'),
+    fcRating: $('#fc-rating'),
+    fcEditDialog: $('#fc-edit-dialog'),
+    fcEditForm: $('#fc-edit-form'),
+    fcEditTitle: $('#fc-edit-title'),
+    fcQInput: $('#fc-q-input'),
+    fcAInput: $('#fc-a-input'),
+    fcContextInput: $('#fc-context-input'),
+    fcCardDelete: $('#fc-card-delete'),
+    fcTimerText: $('#fc-timer-text'),
+    fcCardCounter: $('#fc-card-counter'),
+    fcTtsFront: $('#fc-tts-front'),
+    fcTtsBack: $('#fc-tts-back'),
+    fcContextCard: $('#fc-context-card'),
+    fcContextToggle: $('#fc-context-toggle'),
+    fcContextBody: $('#fc-context-body'),
+    fcContextText: $('#fc-context-text'),
+    fcDeckDialog: $('#fc-deck-dialog'),
+    fcDeckForm: $('#fc-deck-form'),
+    fcDeckDialogTitle: $('#fc-deck-dialog-title'),
+    fcDeckNameInput: $('#fc-deck-name-input'),
+    fcThemePicker: $('#fc-theme-picker'),
+    fcDeckDelete: $('#fc-deck-delete'),
   };
 
   /* =========================================================
@@ -135,6 +176,7 @@
   let ui = {
     view: 'dashboard',
     collectionId: null,
+    fcDeckId: null,
     search: '',
     collectionSummary: null,
   };
@@ -150,8 +192,53 @@
   let deleteConfirmTimer = 0;
 
   /* =========================================================
+     Flashcard state
+     ========================================================= */
+
+  let fcDecks = []; // [{ id, name, theme, cards: [{id,q,a,lastRated}] }]
+  let fcSession = null; // { deckId, queue:[cardId,...], idx, results:{easy,medium,hard} }
+  let fcEditingDeckId = null;
+  let fcEditingCardId = null;
+
+  /* =========================================================
      Persistence
      ========================================================= */
+
+  function loadFcDecks() {
+    try {
+      const raw = localStorage.getItem(FC_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((deck) => ({
+        id: typeof deck.id === 'string' ? deck.id : uid(),
+        name: String(deck.name || 'Deck'),
+        theme: THEMES.includes(deck.theme) ? deck.theme : 'ocean',
+        createdAt: Number(deck.createdAt) || Date.now(),
+        cards: Array.isArray(deck.cards)
+          ? deck.cards.map((card) => ({
+              id: typeof card.id === 'string' ? card.id : uid(),
+              q: String(card.q || ''),
+              a: String(card.a || ''),
+              context: String(card.context || ''),
+              lastRated: card.lastRated || null,
+            }))
+          : [],
+      }));
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveFcDecks() {
+    try {
+      localStorage.setItem(FC_STORAGE_KEY, JSON.stringify(fcDecks));
+    } catch (e) {}
+  }
+
+  function getFcDeck(id) {
+    return fcDecks.find((d) => d.id === id) || null;
+  }
 
   function loadState() {
     try {
@@ -198,7 +285,7 @@
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ version: 2, collections: state.collections })
+        JSON.stringify({ version: 3, collections: state.collections })
       );
     } catch (error) {
       console.warn('ManaNotes: gagal menyimpan data.', error);
@@ -206,109 +293,6 @@
   }
 
   const scheduleSave = debounce(saveNow, 400);
-
-  /* =========================================================
-     Seed data
-     ========================================================= */
-
-  function seedState() {
-    const now = Date.now();
-    const HOUR = 3600000;
-    const DAY = HOUR * 24;
-
-    const makeTask = (text, done = false) => ({ id: uid(), text, done });
-    const makeNote = (title, body, tasks, ago) => ({
-      id: uid(),
-      title,
-      body,
-      tasks,
-      createdAt: now - ago,
-      updatedAt: now - ago,
-    });
-
-    return {
-      collections: [
-        {
-          id: uid(),
-          title: 'Daily memo',
-          subtitle: 'Notes & Journaling',
-          theme: 'ember',
-          createdAt: now - DAY * 6,
-          notes: [
-            makeNote(
-              'Rencana hari ini',
-              'Fokus utama hari ini cuma tiga: beresin draft project, balas email yang nunggu, dan olahraga sore. Sisain waktu buat baca 20 menit sebelum tidur.',
-              [
-                makeTask('Beresin draft project'),
-                makeTask('Balas email klien', true),
-                makeTask('Olahraga 30 menit'),
-                makeTask('Baca 20 menit'),
-              ],
-              HOUR * 2
-            ),
-            makeNote(
-              'Catatan rapat mingguan',
-              'Rapat tadi membahas timeline rilis minggu depan. Tim desain butuh aset final paling lambat hari Rabu. QA mulai Kamis pagi, lalu rilis Jumat sore. Risiko utamanya ada di approval konten yang biasanya molor.',
-              [
-                makeTask('Kirim aset final ke tim'),
-                makeTask('Jadwalkan sesi QA', true),
-                makeTask('Update timeline', true),
-                makeTask('Follow up approval konten'),
-              ],
-              DAY + HOUR * 3
-            ),
-            makeNote(
-              'Jurnal singkat',
-              'Hari ini terasa lebih ringan dari kemarin. Berhasil nyelesaiin satu hal yang udah lama ditunda, dan itu cukup bikin mood naik. Besok mau mulai lebih pagi aja, tanpa target yang terlalu muluk.',
-              [],
-              DAY * 2
-            ),
-          ],
-        },
-        {
-          id: uid(),
-          title: 'Ide konten',
-          subtitle: 'Random sparks',
-          theme: 'ocean',
-          createdAt: now - DAY * 11,
-          notes: [
-            makeNote(
-              'Hook video pendek',
-              "Ide pembuka: 'Kamu nggak butuh aplikasi baru, kamu butuh sistem yang lebih simpel.' Bisa dilanjutin dengan 3 contoh kebiasaan kecil yang bikin kerjaan beres. Visualnya pakai screen recording plus teks besar.",
-              [makeTask('Tulis script 30 detik'), makeTask('Rekam screen')],
-              DAY + HOUR * 5
-            ),
-            makeNote(
-              'Referensi visual',
-              'Cari referensi layout gelap dengan aksen oranye. Fokus ke tipografi besar, card rounded, dan gradient blur. Simpan semuanya di satu folder inspo biar gampang dilihat lagi.',
-              [makeTask('Kumpulin 5 referensi', true)],
-              DAY * 4
-            ),
-          ],
-        },
-        {
-          id: uid(),
-          title: 'Belanja',
-          subtitle: 'Shopping & errands',
-          theme: 'lime',
-          createdAt: now - DAY * 3,
-          notes: [
-            makeNote(
-              'Belanja mingguan',
-              'Cek stok dapur dulu sebelum pergi. Prioritas: sayur, telur, kopi, sabun cuci piring. Jangan lapar pas belanja.',
-              [
-                makeTask('Sayur & buah'),
-                makeTask('Telur'),
-                makeTask('Kopi', true),
-                makeTask('Sabun cuci piring'),
-              ],
-              HOUR * 8
-            ),
-          ],
-        },
-      ],
-    };
-  }
 
   /* =========================================================
      Data helpers
@@ -519,6 +503,399 @@
   }
 
   /* =========================================================
+     Flashcard — rendering
+     ========================================================= */
+
+  function renderFlashcard() {
+    const query = ui.search.trim().toLowerCase();
+    const decks = query
+      ? fcDecks.filter((d) => d.name.toLowerCase().includes(query) ||
+          d.cards.some((c) => c.q.toLowerCase().includes(query) || c.a.toLowerCase().includes(query)))
+      : fcDecks;
+
+    const header = `
+      <header class="page-head">
+        <div>
+          <span class="eyebrow">Belajar</span>
+          <h1 class="page-title">Flashcard</h1>
+          <p class="page-sub">${fcDecks.length} deck · ${fcDecks.reduce((s, d) => s + d.cards.length, 0)} kartu total</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn btn-ghost" type="button" data-action="fc-new-deck">+ Deck baru</button>
+        </div>
+      </header>`;
+
+    if (!fcDecks.length) {
+      els.viewFlashcard.innerHTML = `
+        ${header}
+        <div class="empty-state">
+          <div class="empty-art">${CARDS_SVG}</div>
+          <h3>Belum ada deck</h3>
+          <p>Buat deck flashcard pertama. Tiap deck berisi kartu Tanya-Jawab yang bisa kamu latih kapan saja.</p>
+          <div class="empty-actions">
+            <button class="btn btn-primary" type="button" data-action="fc-new-deck">Buat deck</button>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const deckHTML = decks.length
+      ? `<div class="fc-deck-grid">${decks.map(fcDeckCardHTML).join('')}</div>`
+      : `<div class="no-results"><strong>Tidak ada hasil</strong> Coba kata kunci lain.</div>`;
+
+    els.viewFlashcard.innerHTML = `${header}${deckHTML}`;
+  }
+
+  function fcDeckCardHTML(deck) {
+    const total = deck.cards.length;
+    const easy = deck.cards.filter((c) => c.lastRated === 'easy').length;
+    const medium = deck.cards.filter((c) => c.lastRated === 'medium').length;
+    const hard = deck.cards.filter((c) => c.lastRated === 'hard').length;
+    const rated = deck.cards.filter((c) => c.lastRated).length;
+    const pct = total ? Math.round((easy / total) * 100) : 0;
+
+    return `
+      <article class="fc-deck-card theme-${deck.theme}" tabindex="0" role="button"
+        data-fc-open-deck="${deck.id}" aria-label="Latihan deck ${esc(deck.name)}">
+        <div class="fc-deck-cover">
+          <div class="cover-art"></div>
+          <div class="cover-grain"></div>
+          <div class="cover-shade"></div>
+          <div class="fc-deck-cover-top">
+            <span class="cover-chip">${total} kartu</span>
+            <button class="kebab" type="button" data-fc-edit-deck="${deck.id}"
+              aria-label="Atur deck ${esc(deck.name)}" title="Atur deck">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="fc-deck-panel">
+          <h3>${esc(deck.name)}</h3>
+          <div class="fc-deck-stats">
+            <div class="fc-stat"><span class="fc-stat-n fc-easy-n">${easy}</span><span>Mudah</span></div>
+            <div class="fc-stat"><span class="fc-stat-n">${medium}</span><span>Lumayan</span></div>
+            <div class="fc-stat"><span class="fc-stat-n fc-hard-n">${hard}</span><span>Susah</span></div>
+          </div>
+          <div class="bar" style="margin-top:8px"><span style="width:${pct}%"></span></div>
+          <div class="fc-deck-foot">
+            <span>${rated}/${total} dinilai</span>
+            <button class="btn btn-primary" style="height:34px;font-size:11.5px;padding:0 14px" type="button" data-fc-open-deck="${deck.id}">Latihan</button>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function renderFcDeckDetail(deckId) {
+    const deck = getFcDeck(deckId);
+    if (!deck) { renderFlashcard(); return; }
+    const query = ui.search.trim().toLowerCase();
+    const cards = query
+      ? deck.cards.filter((c) => c.q.toLowerCase().includes(query) || c.a.toLowerCase().includes(query))
+      : deck.cards;
+
+    const ratingLabel = { easy: '😄 Mudah', medium: '🙂 Lumayan', hard: '😕 Susah' };
+
+    const cardsHTML = cards.length
+      ? `<div class="fc-cards-list">${cards.map((card) => `
+          <div class="fc-card-row">
+            <div class="fc-card-row-body">
+              <div class="fc-card-row-q">${esc(card.q)}</div>
+              <div class="fc-card-row-a">${esc(card.a)}</div>
+            </div>
+            <div class="fc-card-row-meta">
+              ${card.lastRated ? `<span class="fc-chip fc-chip-${card.lastRated}">${ratingLabel[card.lastRated]}</span>` : '<span class="fc-chip">Belum dinilai</span>'}
+              <button class="icon-btn" type="button" data-fc-edit-card="${card.id}" data-fc-deck-id="${deck.id}" title="Edit kartu">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+              </button>
+            </div>
+          </div>`).join('')}
+        </div>`
+      : `<div class="no-results"><strong>Tidak ada kartu</strong> Coba kata kunci lain.</div>`;
+
+    els.viewFlashcard.innerHTML = `
+      <div class="view-bar">
+        <button class="back-btn" type="button" data-view="flashcard">${ARROW_LEFT_SVG} Semua deck</button>
+        <div class="view-actions">
+          <button class="btn btn-ghost" type="button" data-fc-edit-deck="${deck.id}">Edit deck</button>
+          <button class="btn btn-ghost" type="button" data-action="fc-new-card" data-fc-deck-id="${deck.id}">+ Kartu</button>
+          <button class="btn btn-primary" type="button" data-fc-open-deck="${deck.id}">▶ Latihan</button>
+        </div>
+      </div>
+
+      <section class="collection-hero theme-${deck.theme}">
+        <div class="hero-art"></div>
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <h2>${esc(deck.name)}</h2>
+          <div class="hero-stats">
+            <span><strong>${deck.cards.length}</strong> kartu</span>
+            <span><strong>${deck.cards.filter((c) => c.lastRated === 'easy').length}</strong> mudah</span>
+            <span><strong>${deck.cards.filter((c) => c.lastRated === 'hard').length}</strong> susah</span>
+          </div>
+        </div>
+      </section>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px 10px">
+        <span class="eyebrow" style="font-size:10px;letter-spacing:.12em;color:var(--faint)">KARTU (${deck.cards.length})</span>
+        <button class="btn btn-ghost" style="height:34px;font-size:11.5px" type="button" data-action="fc-new-card" data-fc-deck-id="${deck.id}">+ Tambah kartu</button>
+      </div>
+
+      ${deck.cards.length === 0
+        ? `<div class="empty-state" style="margin-top:16px">
+            <div class="empty-art">${CARDS_SVG}</div>
+            <h3>Belum ada kartu</h3>
+            <p>Tambahkan kartu pertama ke deck ini.</p>
+            <button class="btn btn-primary" type="button" data-action="fc-new-card" data-fc-deck-id="${deck.id}">+ Tambah kartu</button>
+          </div>`
+        : cardsHTML}`;
+  }
+
+  /* =========================================================
+     Flashcard — deck create/edit dialog (dedicated)
+     ========================================================= */
+
+  let fcEditingDeckId2 = null;
+  let fcDeckSelectedTheme = 'ocean';
+  let fcDeckDeleteTimer = 0;
+
+  function renderFcThemePicker() {
+    if (!els.fcThemePicker) return;
+    els.fcThemePicker.innerHTML = THEMES.map(
+      (theme) => `
+        <button class="theme-swatch theme-${theme} ${theme === fcDeckSelectedTheme ? 'is-active' : ''}"
+          type="button" data-fc-theme="${theme}" aria-label="Warna ${THEME_LABELS[theme]}"
+          aria-pressed="${theme === fcDeckSelectedTheme}" title="${THEME_LABELS[theme]}"></button>`
+    ).join('');
+  }
+
+  function resetFcDeckDeleteButton() {
+    clearTimeout(fcDeckDeleteTimer);
+    if (els.fcDeckDelete) {
+      els.fcDeckDelete.dataset.confirm = '0';
+      els.fcDeckDelete.textContent = 'Hapus deck';
+    }
+  }
+
+  function openFcDeckDialog(deckId = null) {
+    const deck = deckId ? getFcDeck(deckId) : null;
+    fcEditingDeckId2 = deck ? deck.id : null;
+    const usedThemes = new Set(fcDecks.map((d) => d.theme));
+    const freshTheme = THEMES.find((t) => !usedThemes.has(t)) || 'ocean';
+    fcDeckSelectedTheme = deck ? deck.theme : freshTheme;
+
+    els.fcDeckDialogTitle.textContent = deck ? 'Edit deck' : 'Deck baru';
+    els.fcDeckNameInput.value = deck ? deck.name : '';
+    els.fcDeckDelete.hidden = !deck;
+    resetFcDeckDeleteButton();
+    renderFcThemePicker();
+
+    if (!els.fcDeckDialog.open) els.fcDeckDialog.showModal();
+    setTimeout(() => els.fcDeckNameInput.focus(), 60);
+  }
+
+  function closeFcDeckDialog() {
+    if (els.fcDeckDialog && els.fcDeckDialog.open) els.fcDeckDialog.close();
+    fcEditingDeckId2 = null;
+  }
+
+  /* =========================================================
+     Flashcard — card create/edit dialog
+     ========================================================= */
+
+  function openFcCardDialog(deckId, cardId = null) {
+    fcEditingDeckId = deckId;
+    fcEditingCardId = cardId;
+    const deck = getFcDeck(deckId);
+    const card = cardId && deck ? deck.cards.find((c) => c.id === cardId) : null;
+
+    els.fcEditTitle.textContent = card ? 'Edit kartu' : 'Kartu baru';
+    els.fcQInput.value = card ? card.q : '';
+    els.fcAInput.value = card ? card.a : '';
+    if (els.fcContextInput) els.fcContextInput.value = card ? (card.context || '') : '';
+    els.fcCardDelete.hidden = !card;
+
+    if (!els.fcEditDialog.open) els.fcEditDialog.showModal();
+    setTimeout(() => els.fcQInput.focus(), 60);
+  }
+
+  function closeFcCardDialog() {
+    if (els.fcEditDialog.open) els.fcEditDialog.close();
+  }
+
+  /* =========================================================
+     Flashcard — practice session (Timer, TTS, Context, Rating)
+     ========================================================= */
+
+  let fcTimerInterval = null;
+  let fcTimerSeconds = 0;
+  let fcStageMarkup = null;
+
+  function speakText(text) {
+    if (!('speechSynthesis' in window) || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {}
+  }
+
+  function startFcSession(deckId) {
+    const deck = getFcDeck(deckId);
+    if (!deck || !deck.cards.length) {
+      toast('Deck ini belum punya kartu. Tambahkan dulu!');
+      return;
+    }
+
+    const stageEl = $('#fc-stage');
+    if (stageEl && !fcStageMarkup) fcStageMarkup = stageEl.innerHTML;
+
+    const shuffled = deck.cards.slice().sort(() => Math.random() - 0.5);
+    fcSession = {
+      deckId,
+      queue: shuffled.map((c) => c.id),
+      idx: 0,
+      results: { easy: 0, medium: 0, hard: 0 },
+    };
+
+    els.fcDeckName.textContent = deck.name;
+    const card = $('#fc-card');
+    const rating = $('#fc-rating');
+    if (card) card.classList.remove('is-flipped');
+    if (rating) rating.hidden = true;
+
+    // Start practice timer
+    clearInterval(fcTimerInterval);
+    fcTimerSeconds = 0;
+    if (els.fcTimerText) els.fcTimerText.textContent = '00:00';
+    fcTimerInterval = setInterval(() => {
+      fcTimerSeconds++;
+      const mins = pad2(Math.floor(fcTimerSeconds / 60));
+      const secs = pad2(fcTimerSeconds % 60);
+      if (els.fcTimerText) els.fcTimerText.textContent = `${mins}:${secs}`;
+    }, 1000);
+
+    updateFcSessionUI();
+    if (!els.fcModal.open) els.fcModal.showModal();
+  }
+
+  function updateFcSessionUI() {
+    if (!fcSession) return;
+    const deck = getFcDeck(fcSession.deckId);
+    if (!deck) return;
+
+    const total = fcSession.queue.length;
+    const idx = fcSession.idx;
+    const cardId = fcSession.queue[idx];
+    const card = deck.cards.find((c) => c.id === cardId);
+    if (!card) return;
+
+    if (els.fcCurrent) els.fcCurrent.textContent = idx + 1;
+    if (els.fcTotal) els.fcTotal.textContent = total;
+    if (els.fcProgressFill) els.fcProgressFill.style.width = `${Math.round((idx / total) * 100)}%`;
+    if (els.fcCardCounter) els.fcCardCounter.textContent = `Kartu ${idx + 1}`;
+
+    const frontText = $('#fc-front-text');
+    const backText = $('#fc-back-text');
+    if (frontText) frontText.textContent = card.q;
+    if (backText) backText.textContent = card.a;
+
+    // Word in use / context
+    const contextCard = $('#fc-context-card');
+    const contextText = $('#fc-context-text');
+    const contextBody = $('#fc-context-body');
+    const contextToggle = $('#fc-context-toggle');
+    if (contextCard && contextText) {
+      if (card.context && card.context.trim()) {
+        contextCard.hidden = false;
+        contextText.textContent = card.context.trim();
+        if (contextBody) contextBody.hidden = true;
+        if (contextToggle) contextToggle.setAttribute('aria-expanded', 'false');
+      } else {
+        contextCard.hidden = true;
+      }
+    }
+
+    const fcCard = $('#fc-card');
+    const fcRating = $('#fc-rating');
+    if (fcCard) fcCard.classList.remove('is-flipped');
+    if (fcRating) fcRating.hidden = true;
+  }
+
+  function rateFcCard(rating) {
+    if (!fcSession) return;
+    const deck = getFcDeck(fcSession.deckId);
+    if (!deck) return;
+
+    const cardId = fcSession.queue[fcSession.idx];
+    const card = deck.cards.find((c) => c.id === cardId);
+    if (card) card.lastRated = rating;
+    fcSession.results[rating] = (fcSession.results[rating] || 0) + 1;
+    saveFcDecks();
+
+    fcSession.idx++;
+    if (fcSession.idx >= fcSession.queue.length) {
+      showFcResult();
+      return;
+    }
+
+    const wrap = $('#fc-card-wrap');
+    if (wrap) {
+      wrap.classList.add('fc-slide-out');
+      setTimeout(() => {
+        if (wrap.isConnected) wrap.classList.remove('fc-slide-out');
+        updateFcSessionUI();
+      }, 180);
+    } else {
+      updateFcSessionUI();
+    }
+  }
+
+  function showFcResult() {
+    clearInterval(fcTimerInterval);
+    const r = fcSession.results;
+    const total = fcSession.queue.length;
+    const deckId = fcSession.deckId;
+    const stage = $('#fc-stage');
+    if (!stage) return;
+    if (!fcStageMarkup) fcStageMarkup = stage.innerHTML;
+    const mins = pad2(Math.floor(fcTimerSeconds / 60));
+    const secs = pad2(fcTimerSeconds % 60);
+
+    stage.innerHTML = `
+      <div class="fc-result">
+        <div class="fc-result-emoji">🎉</div>
+        <h3>Sesi selesai!</h3>
+        <p>${total} kartu sudah direview dalam <strong>${mins}:${secs}</strong></p>
+        <div class="fc-result-breakdown">
+          <div class="fc-rb-item fc-easy-n"><span>${r.easy || 0}</span>Mudah</div>
+          <div class="fc-rb-item"><span>${r.medium || 0}</span>Lumayan</div>
+          <div class="fc-rb-item fc-hard-n"><span>${r.hard || 0}</span>Susah</div>
+        </div>
+        <div class="fc-result-actions">
+          <button class="btn btn-ghost" type="button" id="fc-restart-btn">Ulangi sesi</button>
+          <button class="btn btn-primary" type="button" id="fc-done-btn">Selesai</button>
+        </div>
+      </div>`;
+
+    $('#fc-restart-btn').addEventListener('click', () => {
+      if (!fcStageMarkup) return;
+      stage.innerHTML = fcStageMarkup;
+      startFcSession(deckId);
+    });
+    $('#fc-done-btn').addEventListener('click', closeFcModal);
+  }
+
+  function closeFcModal() {
+    clearInterval(fcTimerInterval);
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (els.fcModal.open) els.fcModal.close();
+    fcSession = null;
+    if (ui.view === 'flashcard') renderFlashcard();
+    else if (ui.view === 'flashcard-deck') renderFcDeckDetail(ui.fcDeckId);
+  }
+
+  /* =========================================================
      Rendering
      ========================================================= */
 
@@ -526,6 +903,7 @@
     els.viewDashboard.hidden = ui.view !== 'dashboard';
     els.viewCollection.hidden = ui.view !== 'collection';
     els.viewTodo.hidden = ui.view !== 'todo';
+    els.viewFlashcard.hidden = ui.view !== 'flashcard' && ui.view !== 'flashcard-deck';
 
     renderSidebar();
     updateSearchPlaceholder();
@@ -535,7 +913,9 @@
   function renderCurrentView() {
     if (ui.view === 'dashboard') renderDashboard();
     else if (ui.view === 'collection') renderCollection();
-    else renderTodo();
+    else if (ui.view === 'todo') renderTodo();
+    else if (ui.view === 'flashcard') renderFlashcard();
+    else if (ui.view === 'flashcard-deck') renderFcDeckDetail(ui.fcDeckId);
   }
 
   function updateSearchPlaceholder() {
@@ -543,22 +923,27 @@
       dashboard: 'Cari koleksi...',
       collection: 'Cari catatan...',
       todo: 'Cari to-do...',
+      flashcard: 'Cari deck...',
+      'flashcard-deck': 'Cari kartu...',
     };
     els.search.placeholder = placeholders[ui.view] || 'Cari...';
   }
 
   function renderSidebar() {
     $$('.nav-btn').forEach((button) => {
-      button.classList.toggle('is-active', button.dataset.view === ui.view);
+      const view = button.dataset.view;
+      const isActive = view === ui.view || (view === 'flashcard' && ui.view === 'flashcard-deck');
+      button.classList.toggle('is-active', isActive);
     });
 
     const stats = globalStats();
     els.navTodoCount.textContent = String(stats.open);
     els.navTodoCount.hidden = stats.open === 0;
 
-    els.sidebarCollections.innerHTML = state.collections
-      .map(
-        (collection) => `
+    els.sidebarCollections.innerHTML = state.collections.length
+      ? state.collections
+          .map(
+            (collection) => `
           <button class="collection-item ${
             ui.view === 'collection' && ui.collectionId === collection.id ? 'is-active' : ''
           }" type="button" data-open-collection="${collection.id}">
@@ -566,8 +951,9 @@
             <span class="collection-name">${esc(collection.title)}</span>
             <span class="collection-count">${pad2(collectionStats(collection).notes)}</span>
           </button>`
-      )
-      .join('');
+          )
+          .join('')
+      : '<p class="side-empty">Belum ada koleksi. Klik tombol + di atas untuk mulai.</p>';
 
     const percent = stats.total ? Math.round((stats.done / stats.total) * 100) : 0;
     els.sideRing.style.setProperty('--pct', percent);
@@ -590,8 +976,11 @@
         <div class="empty-state">
           <div class="empty-art">${FOLDER_SVG}</div>
           <h3>Belum ada koleksi</h3>
-          <p>Bikin koleksi pertama buat mulai nulis catatan, to-do, dan ringkasannya.</p>
-          <button class="btn btn-primary" type="button" data-action="new-collection">Buat koleksi</button>
+          <p>Bikin koleksi pertama buat mulai nulis catatan, to-do, dan ringkasannya. Belum yakin caranya? Buka panduan singkat dulu.</p>
+          <div class="empty-actions">
+            <button class="btn btn-primary" type="button" data-action="new-collection">Buat koleksi</button>
+            <button class="btn btn-ghost" type="button" data-action="open-tutorial">Lihat panduan</button>
+          </div>
         </div>`;
       return;
     }
@@ -877,8 +1266,11 @@
         <div class="empty-state">
           <div class="empty-art">${CHECK_SQUARE_SVG}</div>
           <h3>Belum ada to-do</h3>
-          <p>Buka catatan mana pun, lalu tambahkan checklist di panel To-do.</p>
-          <button class="btn btn-primary" type="button" data-view="dashboard">Lihat koleksi</button>
+          <p>Buat koleksi dan catatan dulu, lalu tambahkan checklist di panel To-do saat menulis.</p>
+          <div class="empty-actions">
+            <button class="btn btn-primary" type="button" data-view="dashboard">Lihat koleksi</button>
+            <button class="btn btn-ghost" type="button" data-action="open-tutorial">Lihat panduan</button>
+          </div>
         </div>`;
       return;
     }
@@ -957,9 +1349,20 @@
   function go(view) {
     ui.view = view;
     if (view !== 'collection') ui.collectionId = null;
+    if (view !== 'flashcard-deck') ui.fcDeckId = null;
     ui.search = '';
     els.search.value = '';
     if (view !== 'collection') ui.collectionSummary = null;
+    renderAll();
+    els.main.scrollTop = 0;
+  }
+
+  function openFcDeck(deckId) {
+    if (!getFcDeck(deckId)) return;
+    ui.view = 'flashcard-deck';
+    ui.fcDeckId = deckId;
+    ui.search = '';
+    els.search.value = '';
     renderAll();
     els.main.scrollTop = 0;
   }
@@ -1191,6 +1594,46 @@
   }
 
   /* =========================================================
+     Tutorial
+     ========================================================= */
+
+  function tutorialSeen() {
+    try {
+      return localStorage.getItem(TUTORIAL_KEY) === '1';
+    } catch (error) {
+      return true;
+    }
+  }
+
+  function markTutorialSeen() {
+    try {
+      localStorage.setItem(TUTORIAL_KEY, '1');
+    } catch (error) {
+      /* ignore */
+    }
+  }
+
+  function openTutorial() {
+    if (!els.tutorialDialog || els.tutorialDialog.open) return;
+    if (els.tutorialStart) {
+      els.tutorialStart.textContent = state.collections.length
+        ? 'Mengerti'
+        : 'Buat koleksi pertama';
+    }
+    els.tutorialDialog.showModal();
+  }
+
+  function closeTutorial() {
+    markTutorialSeen();
+    if (els.tutorialDialog && els.tutorialDialog.open) els.tutorialDialog.close();
+  }
+
+  function finishTutorial() {
+    closeTutorial();
+    if (!state.collections.length) openCollectionDialog();
+  }
+
+  /* =========================================================
      Actions
      ========================================================= */
 
@@ -1383,11 +1826,38 @@
       const action = actionButton.dataset.action;
       if (action === 'new-note') createNote();
       else if (action === 'new-collection') openCollectionDialog();
+      else if (action === 'open-tutorial') openTutorial();
       else if (action === 'summarize-collection') summarizeCollection();
       else if (action === 'close-summary') {
         ui.collectionSummary = null;
         renderCollection();
       }
+      else if (action === 'fc-new-deck') openFcDeckDialog();
+      else if (action === 'fc-new-card') {
+        const deckId = actionButton.dataset.fcDeckId;
+        if (deckId) openFcCardDialog(deckId);
+      }
+      return;
+    }
+
+    const fcOpenDeckBtn = event.target.closest('[data-fc-open-deck]');
+    if (fcOpenDeckBtn && !event.target.closest('[data-fc-edit-deck]')) {
+      event.preventDefault();
+      startFcSession(fcOpenDeckBtn.dataset.fcOpenDeck);
+      return;
+    }
+
+    const fcEditDeckBtn = event.target.closest('[data-fc-edit-deck]');
+    if (fcEditDeckBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      openFcDeckDialog(fcEditDeckBtn.dataset.fcEditDeck);
+      return;
+    }
+
+    const fcEditCardBtn = event.target.closest('[data-fc-edit-card]');
+    if (fcEditCardBtn) {
+      openFcCardDialog(fcEditCardBtn.dataset.fcDeckId, fcEditCardBtn.dataset.fcEditCard);
       return;
     }
 
@@ -1424,7 +1894,139 @@
     if (closeDialogButton) {
       closeCollectionDialog();
     }
+
+    const closeFcDialogButton = event.target.closest('[data-close-fc-dialog]');
+    if (closeFcDialogButton) {
+      closeFcCardDialog();
+    }
+
+    const closeFcDeckDialogButton = event.target.closest('[data-close-fc-deck-dialog]');
+    if (closeFcDeckDialogButton) {
+      closeFcDeckDialog();
+    }
   });
+
+  // Flashcard practice modal events
+  els.fcClose.addEventListener('click', closeFcModal);
+  els.fcModal.addEventListener('cancel', (e) => { e.preventDefault(); closeFcModal(); });
+  els.fcModal.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); closeFcModal(); } });
+
+  // Flip card on click, TTS, and context toggle
+  els.fcModal.addEventListener('click', (e) => {
+    // Rating buttons
+    if (e.target.closest('[data-rate]')) {
+      rateFcCard(e.target.closest('[data-rate]').dataset.rate);
+      return;
+    }
+
+    // TTS speaker buttons
+    const ttsFront = e.target.closest('#fc-tts-front');
+    if (ttsFront) {
+      e.stopPropagation();
+      const text = $('#fc-front-text');
+      if (text) speakText(text.textContent);
+      return;
+    }
+    const ttsBack = e.target.closest('#fc-tts-back');
+    if (ttsBack) {
+      e.stopPropagation();
+      const text = $('#fc-back-text');
+      if (text) speakText(text.textContent);
+      return;
+    }
+
+    // Context toggle (Word in use)
+    const contextToggle = e.target.closest('#fc-context-toggle');
+    if (contextToggle) {
+      e.stopPropagation();
+      const body = $('#fc-context-body');
+      if (body) {
+        body.hidden = !body.hidden;
+        contextToggle.setAttribute('aria-expanded', String(!body.hidden));
+      }
+      return;
+    }
+
+    // Card flip
+    if (e.target.closest('#fc-card-wrap') || e.target.closest('#fc-card')) {
+      const card = $('#fc-card');
+      if (card && !card.classList.contains('is-flipped')) {
+        card.classList.add('is-flipped');
+        const rating = $('#fc-rating');
+        if (rating) rating.hidden = false;
+      }
+    }
+  });
+
+  // Keyboard for practice: space/enter = flip, 1=hard, 2=medium, 3=easy
+  els.fcModal.addEventListener('keydown', (e) => {
+    if (!fcSession) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      const card = $('#fc-card');
+      if (card && !card.classList.contains('is-flipped')) {
+        card.classList.add('is-flipped');
+        const rating = $('#fc-rating');
+        if (rating) rating.hidden = false;
+      }
+    } else if (e.key === '1') { rateFcCard('hard'); }
+    else if (e.key === '2') { rateFcCard('medium'); }
+    else if (e.key === '3') { rateFcCard('easy'); }
+  });
+
+  // Flashcard card edit dialog form
+  els.fcEditForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = els.fcQInput.value.trim();
+    const a = els.fcAInput.value.trim();
+    const context = els.fcContextInput ? els.fcContextInput.value.trim() : '';
+    if (!q || !a) {
+      toast('Isi pertanyaan dan jawaban dulu ya!');
+      return;
+    }
+
+    const deck = getFcDeck(fcEditingDeckId);
+    if (!deck) return;
+
+    if (fcEditingCardId) {
+      const card = deck.cards.find((c) => c.id === fcEditingCardId);
+      if (card) {
+        card.q = q;
+        card.a = a;
+        card.context = context;
+      }
+      toast('Kartu diperbarui.');
+    } else {
+      deck.cards.push({ id: uid(), q, a, context, lastRated: null });
+      toast('Kartu baru ditambahkan.');
+    }
+    saveFcDecks();
+    closeFcCardDialog();
+    if (ui.view === 'flashcard-deck') renderFcDeckDetail(fcEditingDeckId);
+    else if (ui.view === 'flashcard') renderFlashcard();
+  });
+
+  els.fcCardDelete.addEventListener('click', () => {
+    if (!fcEditingCardId || !fcEditingDeckId) return;
+    const deck = getFcDeck(fcEditingDeckId);
+    if (!deck) return;
+    const idx = deck.cards.findIndex((c) => c.id === fcEditingCardId);
+    if (idx === -1) return;
+    const [removed] = deck.cards.splice(idx, 1);
+    saveFcDecks();
+    closeFcCardDialog();
+    if (ui.view === 'flashcard-deck') renderFcDeckDetail(fcEditingDeckId);
+    else if (ui.view === 'flashcard') renderFlashcard();
+    toast('Kartu dihapus.', 'Urungkan', () => {
+      deck.cards.splice(Math.min(idx, deck.cards.length), 0, removed);
+      saveFcDecks();
+      if (ui.view === 'flashcard-deck') renderFcDeckDetail(fcEditingDeckId);
+      else if (ui.view === 'flashcard') renderFlashcard();
+    });
+  });
+
+  els.fcEditDialog.addEventListener('cancel', (e) => { e.preventDefault(); closeFcCardDialog(); });
+  els.fcEditDialog.addEventListener('click', (e) => { if (e.target === els.fcEditDialog) closeFcCardDialog(); });
 
   document.addEventListener('keydown', (event) => {
     if (document.querySelector('dialog[open]')) return;
@@ -1611,7 +2213,32 @@
     }, 650);
   });
 
-  // Collection dialog events
+  // Tutorial events
+  els.helpBtn.addEventListener('click', openTutorial);
+  if (els.tutorialStart) els.tutorialStart.addEventListener('click', finishTutorial);
+
+  if (els.tutorialDialog) {
+    els.tutorialDialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      closeTutorial();
+    });
+
+    els.tutorialDialog.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      closeTutorial();
+    });
+
+    els.tutorialDialog.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close-tutorial]')) {
+        closeTutorial();
+        return;
+      }
+      if (event.target === els.tutorialDialog) closeTutorial();
+    });
+  }
+
+  // Collection dialog events (ONLY for collections/notes)
   els.collectionForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -1666,6 +2293,11 @@
     if (event.target === els.collectionDialog) closeCollectionDialog();
   });
 
+  els.collectionDialog.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    closeCollectionDialog();
+  });
+
   els.collectionDelete.addEventListener('click', () => {
     if (!editingCollectionId) return;
 
@@ -1699,7 +2331,102 @@
     });
   });
 
-  window.addEventListener('beforeunload', saveNow);
+  // Flashcard Deck dialog events (DEDICATED - completely independent from collections)
+  if (els.fcDeckForm) {
+    els.fcDeckForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = els.fcDeckNameInput.value.trim();
+      if (!name) {
+        els.fcDeckNameInput.focus();
+        return;
+      }
+
+      if (fcEditingDeckId2) {
+        const deck = getFcDeck(fcEditingDeckId2);
+        if (deck) {
+          deck.name = name;
+          deck.theme = fcDeckSelectedTheme;
+        }
+        saveFcDecks();
+        closeFcDeckDialog();
+        renderAll();
+        toast('Deck diperbarui.');
+      } else {
+        const deck = {
+          id: uid(),
+          name,
+          theme: fcDeckSelectedTheme,
+          createdAt: Date.now(),
+          cards: [],
+        };
+        fcDecks.unshift(deck);
+        saveFcDecks();
+        closeFcDeckDialog();
+        openFcDeck(deck.id);
+        toast('Deck baru dibuat.');
+      }
+    });
+  }
+
+  if (els.fcThemePicker) {
+    els.fcThemePicker.addEventListener('click', (event) => {
+      const swatch = event.target.closest('[data-fc-theme]');
+      if (!swatch) return;
+      fcDeckSelectedTheme = swatch.dataset.fcTheme;
+      $$('.theme-swatch', els.fcThemePicker).forEach((button) => {
+        const active = button === swatch;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    });
+  }
+
+  if (els.fcDeckDialog) {
+    els.fcDeckDialog.addEventListener('click', (e) => {
+      if (e.target === els.fcDeckDialog) closeFcDeckDialog();
+    });
+    els.fcDeckDialog.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeFcDeckDialog();
+    });
+  }
+
+  if (els.fcDeckDelete) {
+    els.fcDeckDelete.addEventListener('click', () => {
+      if (!fcEditingDeckId2) return;
+      if (els.fcDeckDelete.dataset.confirm !== '1') {
+        els.fcDeckDelete.dataset.confirm = '1';
+        els.fcDeckDelete.textContent = 'Yakin? Klik lagi';
+        clearTimeout(fcDeckDeleteTimer);
+        fcDeckDeleteTimer = setTimeout(resetFcDeckDeleteButton, 2600);
+        return;
+      }
+
+      const deck = getFcDeck(fcEditingDeckId2);
+      if (!deck) return;
+
+      const idx = fcDecks.indexOf(deck);
+      fcDecks.splice(idx, 1);
+      saveFcDecks();
+      const wasId = fcEditingDeckId2;
+      fcEditingDeckId2 = null;
+      closeFcDeckDialog();
+
+      if (ui.view === 'flashcard-deck' && ui.fcDeckId === wasId) {
+        go('flashcard');
+      } else {
+        renderAll();
+      }
+
+      toast(`Deck "${deck.name}" dihapus.`, 'Urungkan', () => {
+        fcDecks.splice(Math.min(idx, fcDecks.length), 0, deck);
+        saveFcDecks();
+        renderAll();
+      });
+    });
+  }
+
+  window.addEventListener('beforeunload', () => { saveNow(); saveFcDecks(); });
 
   /* =========================================================
      Boot
@@ -1707,9 +2434,14 @@
 
   function init() {
     const saved = loadState();
-    state = saved || seedState();
+    state = saved || { collections: [] };
     if (!saved) saveNow();
+    fcDecks = loadFcDecks();
     renderAll();
+
+    if (!tutorialSeen()) {
+      setTimeout(openTutorial, 420);
+    }
   }
 
   init();

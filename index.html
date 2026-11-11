@@ -20,7 +20,7 @@
         <span class="brand-mark" aria-hidden="true">M</span>
         <span class="brand-name">
           ManaNotes
-          <small>notes & tasks</small>
+          <small>website thats keep you learn</small>
         </span>
       </a>
 
@@ -34,6 +34,13 @@
       </label>
 
       <div class="appbar-actions">
+        <button class="icon-btn help-btn" id="btn-help" type="button" aria-label="Buka panduan" title="Panduan">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.6 9.3a2.5 2.5 0 1 1 3.9 2.1c-.9.6-1.5 1.1-1.5 2.3" />
+            <path d="M12 17.1h.01" />
+          </svg>
+        </button>
         <span class="local-chip"><span class="local-dot"></span>Tersimpan lokal</span>
         <button class="btn btn-primary" id="btn-new-note" type="button">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
@@ -65,6 +72,14 @@
               </svg>
               <span>To-do</span>
               <span class="badge" id="nav-todo-count">0</span>
+            </button>
+            <button class="nav-btn" type="button" data-view="flashcard">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="6" width="20" height="14" rx="3.5" />
+                <path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h7A1.5 1.5 0 0 1 17 4.5V6" />
+                <path d="M12 10v4M10 12h4" />
+              </svg>
+              <span>Flashcard</span>
             </button>
           </nav>
         </div>
@@ -98,6 +113,7 @@
         <section class="view" id="view-dashboard" aria-label="Beranda"></section>
         <section class="view" id="view-collection" aria-label="Koleksi" hidden></section>
         <section class="view" id="view-todo" aria-label="Semua to-do" hidden></section>
+        <section class="view" id="view-flashcard" aria-label="Flashcard" hidden></section>
       </main>
     </div>
   </div>
@@ -215,10 +231,225 @@
     </form>
   </dialog>
 
+  <!-- Tutorial -->
+  <dialog class="tutorial" id="tutorial-dialog" aria-labelledby="tutorial-title">
+    <div class="tutorial-art" aria-hidden="true">
+      <span class="tutorial-mark">M</span>
+      <span class="tutorial-spark">✦</span>
+    </div>
+
+    <div class="tutorial-body">
+      <span class="eyebrow">Panduan singkat</span>
+      <h2 id="tutorial-title">Kenalan sama ManaNotes</h2>
+      <p class="tutorial-sub">Tiga langkah kecil, setelah itu tinggal nulis.</p>
+
+      <ol class="tutorial-steps">
+        <li>
+          <span class="step-num">1</span>
+          <div>
+            <strong>Bikin koleksi</strong>
+            <p>Koleksi itu folder buat mengelompokkan catatan. Klik <b>+ Koleksi baru</b>, kasih nama, pilih warna sampul.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <div>
+            <strong>Tulis catatan &amp; to-do</strong>
+            <p>Di dalam koleksi, tambahkan catatan. Isi teksnya, lalu tambah checklist di panel <b>To-do</b> di samping.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <div>
+            <strong>Ringkas &amp; pantau</strong>
+            <p>Klik <b>Ringkas</b> untuk mengambil poin penting. Semua checklist terkumpul rapi di menu <b>To-do</b>.</p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="tutorial-note">
+        <span class="local-dot"></span>
+        <span>Semua catatan tersimpan di browser ini. Panduan ini bisa dibuka lagi lewat tombol <b>?</b> di kanan atas.</span>
+      </p>
+    </div>
+
+    <footer class="tutorial-actions">
+      <button class="btn btn-ghost" type="button" data-close-tutorial>Nanti saja</button>
+      <button class="btn btn-primary" id="tutorial-start" type="button">Buat koleksi pertama</button>
+    </footer>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite">
     <span id="toast-text">Tersimpan</span>
     <button type="button" id="toast-action" hidden>Urungkan</button>
   </div>
+
+  <!-- Flashcard Practice Modal -->
+  <dialog class="fc-modal" id="fc-modal" aria-label="Latihan Flashcard">
+    <div class="fc-modal-inner">
+      <div class="fc-modal-bar">
+        <button class="icon-btn" id="fc-close" type="button" aria-label="Tutup latihan">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <div class="fc-modal-title">
+          <span class="fc-title-deck" id="fc-deck-name">Practice</span>
+        </div>
+        <div class="fc-timer" id="fc-timer" title="Waktu latihan">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="13" r="8" />
+            <path d="M12 9v4l2.5 2" />
+            <path d="M10 2h4" />
+          </svg>
+          <span id="fc-timer-text">00:00</span>
+        </div>
+      </div>
+      <div class="fc-modal-subbar">
+        <span class="fc-level-chip">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span id="fc-card-counter">Kartu 1</span>
+        </span>
+        <div class="fc-modal-progress">
+          <div class="fc-progress-bar"><span id="fc-progress-fill" style="width:0%"></span></div>
+        </div>
+        <span class="fc-progress-fraction"><span id="fc-current">1</span>/<span id="fc-total">1</span></span>
+      </div>
+      <div class="fc-stage" id="fc-stage">
+        <!-- Stacked card effect -->
+        <div class="fc-stack-container">
+          <div class="fc-stack-layer layer-2"></div>
+          <div class="fc-stack-layer layer-1"></div>
+          <div class="fc-card-wrap" id="fc-card-wrap">
+            <div class="fc-card" id="fc-card">
+              <div class="fc-face fc-front">
+                <button class="fc-tts-btn" id="fc-tts-front" type="button" aria-label="Dengarkan pengucapan" title="Dengarkan">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                </button>
+                <span class="fc-label">Pertanyaan</span>
+                <div class="fc-text" id="fc-front-text"></div>
+                <div class="fc-tap-hint">Ketuk untuk melihat jawaban</div>
+              </div>
+              <div class="fc-face fc-back">
+                <button class="fc-tts-btn" id="fc-tts-back" type="button" aria-label="Dengarkan jawaban" title="Dengarkan">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  </svg>
+                </button>
+                <span class="fc-label">Jawaban</span>
+                <div class="fc-text" id="fc-back-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Word in use / Example collapsible -->
+        <div class="fc-context-card" id="fc-context-card" hidden>
+          <button class="fc-context-toggle" id="fc-context-toggle" type="button" aria-expanded="false">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="fc-context-title">Contoh penggunaan</span>
+            <svg class="ico fc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <div class="fc-context-body" id="fc-context-body" hidden>
+            <p id="fc-context-text"></p>
+          </div>
+        </div>
+
+        <div class="fc-rating" id="fc-rating" hidden>
+          <button class="fc-rate-btn fc-hard" type="button" data-rate="hard">
+            <span class="fc-emoji">🙁</span>
+            <span>Hard</span>
+          </button>
+          <button class="fc-rate-btn fc-medium" type="button" data-rate="medium">
+            <span class="fc-emoji">🙂</span>
+            <span>Medium</span>
+          </button>
+          <button class="fc-rate-btn fc-easy" type="button" data-rate="easy">
+            <span class="fc-emoji">😆</span>
+            <span>Easy</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Flashcard Add/Edit Dialog -->
+  <dialog class="modal" id="fc-edit-dialog" aria-label="Edit Flashcard">
+    <form id="fc-edit-form">
+      <header class="modal-head">
+        <div>
+          <span class="eyebrow">Flashcard</span>
+          <h3 id="fc-edit-title">Flashcard baru</h3>
+        </div>
+        <button class="icon-btn" type="button" data-close-fc-dialog aria-label="Tutup">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </header>
+      <div class="field">
+        <label for="fc-q-input">Pertanyaan (depan kartu)</label>
+        <textarea id="fc-q-input" placeholder="Contoh: Apa itu fotosintesis?" rows="3" maxlength="400" autocomplete="off"></textarea>
+      </div>
+      <div class="field">
+        <label for="fc-a-input">Jawaban (belakang kartu)</label>
+        <textarea id="fc-a-input" placeholder="Contoh: Proses tumbuhan mengubah cahaya jadi energi." rows="4" maxlength="800" autocomplete="off"></textarea>
+      </div>
+      <div class="field">
+        <label for="fc-context-input">Contoh penggunaan / Catatan (opsional)</label>
+        <textarea id="fc-context-input" placeholder="Contoh: Tumbuhan hijau memerlukan klorofil untuk fotosintesis." rows="2" maxlength="400" autocomplete="off"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="fc-card-delete" type="button" hidden>Hapus kartu</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost" type="button" data-close-fc-dialog>Batal</button>
+        <button class="btn btn-primary" type="submit">Simpan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Flashcard Deck Add/Edit Dialog -->
+  <dialog class="modal" id="fc-deck-dialog" aria-label="Deck Flashcard">
+    <form id="fc-deck-form">
+      <header class="modal-head">
+        <div>
+          <span class="eyebrow">Flashcard</span>
+          <h3 id="fc-deck-dialog-title">Deck baru</h3>
+        </div>
+        <button class="icon-btn" type="button" data-close-fc-deck-dialog aria-label="Tutup">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="field">
+        <label for="fc-deck-name-input">Nama deck</label>
+        <input id="fc-deck-name-input" type="text" placeholder="Misal: Biologi, Vocabulary" maxlength="40" required autocomplete="off" />
+      </div>
+      <div class="field">
+        <span class="field-label">Warna sampul</span>
+        <div class="theme-picker" id="fc-theme-picker"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="fc-deck-delete" type="button" hidden>Hapus deck</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost" type="button" data-close-fc-deck-dialog>Batal</button>
+        <button class="btn btn-primary" type="submit">Simpan</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="app.js"></script>
 </body>
