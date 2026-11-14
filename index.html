@@ -519,7 +519,7 @@
   </dialog>
 
   <!-- Book PDF Reader overlay -->
-  <div class="book-reader" id="book-reader" hidden>
+  <div class="book-reader" id="book-reader" tabindex="-1" hidden>
     <!-- Top bar -->
     <div class="reader-bar">
       <button class="icon-btn" id="reader-close" type="button" aria-label="Tutup reader">
@@ -529,6 +529,21 @@
       </button>
       <span class="reader-bar-title" id="reader-title">Buku</span>
       <span class="reader-bar-info" id="reader-page-info">Hal. 1 / 1</span>
+      <div class="reader-mode-switch" role="group" aria-label="Mode baca">
+        <button class="reader-mode-btn is-active" id="reader-mode-3d" type="button" aria-pressed="true" title="Mode buku 3D">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 6.2C10.4 5 8.2 4.4 5.4 4.6A1.2 1.2 0 0 0 4.3 5.8v12.4c0 .7.6 1.2 1.3 1.2 2.6-.2 4.7.4 6.4 1.6 1.7-1.2 3.8-1.8 6.4-1.6.7 0 1.3-.5 1.3-1.2V5.8c0-.7-.5-1.2-1.1-1.2-2.8-.2-5 .4-6.6 1.6Z" />
+            <path d="M12 6.2V21" />
+          </svg>
+          <span>3D</span>
+        </button>
+        <button class="reader-mode-btn" id="reader-mode-text" type="button" aria-pressed="false" title="Mode teks">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h10" />
+          </svg>
+          <span>Teks</span>
+        </button>
+      </div>
       <div class="reader-bar-actions">
         <button class="reader-nav-btn" id="reader-zoom-out" type="button" title="Perkecil" aria-label="Zoom out">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.4-3.4"/><path d="M8 11h6"/></svg>
@@ -553,6 +568,11 @@
         <div class="reader-spine" id="reader-spine"></div>
         <!-- Right page (odd / current) -->
         <div class="reader-page-right" id="reader-page-right"></div>
+      </div>
+
+      <!-- Text-only reading pane -->
+      <div class="reader-text" id="reader-text" hidden>
+        <article class="reader-text-inner" id="reader-text-inner"></article>
       </div>
 
       <div class="reader-swipe-hint">← Geser untuk ganti halaman →</div>
