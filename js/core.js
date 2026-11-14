@@ -137,6 +137,7 @@ export const els = {
   toastText: $('#toast-text'),
   toastAction: $('#toast-action'),
   viewFlashcard: $('#view-flashcard'),
+  viewBooks: $('#view-books'),
   fcModal: $('#fc-modal'),
   fcClose: $('#fc-close'),
   fcDeckName: $('#fc-deck-name'),

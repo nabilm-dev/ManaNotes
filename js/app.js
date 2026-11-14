@@ -21,6 +21,7 @@ import {
 } from './flashcards.js';
 import { openTutorial, initTutorialEvents, tutorialSeen } from './tutorial.js';
 import { initRundownEvents } from './rundown.js';
+import { renderBooks, initBooks } from './books.js';
 
 /* =========================================================
    Rendering
@@ -31,6 +32,7 @@ function renderAll() {
   els.viewCollection.hidden = ui.view !== 'collection';
   els.viewTodo.hidden = ui.view !== 'todo';
   els.viewFlashcard.hidden = ui.view !== 'flashcard' && ui.view !== 'flashcard-deck';
+  els.viewBooks.hidden = ui.view !== 'books';
 
   renderSidebar();
   updateSearchPlaceholder();
@@ -43,6 +45,7 @@ function renderCurrentView() {
   else if (ui.view === 'todo') renderTodo();
   else if (ui.view === 'flashcard') renderFlashcard();
   else if (ui.view === 'flashcard-deck') renderFcDeckDetail(ui.fcDeckId);
+  else if (ui.view === 'books') renderBooks();
 }
 
 function updateSearchPlaceholder() {
@@ -52,6 +55,7 @@ function updateSearchPlaceholder() {
     todo: 'Cari to-do...',
     flashcard: 'Cari deck...',
     'flashcard-deck': 'Cari kartu...',
+    books: 'Cari buku...',
   };
   els.search.placeholder = placeholders[ui.view] || 'Cari...';
 }
@@ -289,6 +293,7 @@ function init() {
 
   initNotesEvents();
   initFlashcards();
+  initBooks();
   initTutorialEvents();
   initRundownEvents();
 
