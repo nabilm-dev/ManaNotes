@@ -14,6 +14,7 @@ import {
 } from './core.js';
 import { summarize, buildSummarySource } from './summary.js';
 import { rundownWidgetHTML } from './rundown.js';
+import { pomodoroWidgetHTML } from './pomodoro.js';
 
 /* =========================================================
    Module state
@@ -38,6 +39,7 @@ export function renderDashboard() {
   if (!state.collections.length) {
     els.viewDashboard.innerHTML = `
       ${pageHead('Workspace', 'Beranda', 'Mulai dari satu koleksi kecil. Nanti bisa nambah lagi.')}
+      ${pomodoroWidgetHTML()}
       ${rundownWidgetHTML()}
       <div class="empty-state">
         <div class="empty-art">${FOLDER_SVG}</div>
@@ -65,6 +67,7 @@ export function renderDashboard() {
         <button class="btn btn-ghost" type="button" data-action="new-collection">+ Koleksi baru</button>
       </div>
     </header>
+    ${pomodoroWidgetHTML()}
     ${rundownWidgetHTML()}
     <div class="dashboard-section-head">
       <div>

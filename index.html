@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="css/flashcards.css" />
   <link rel="stylesheet" href="css/books.css" />
   <link rel="stylesheet" href="css/rundown.css" />
+  <link rel="stylesheet" href="css/pomodoro.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
 </head>
@@ -83,6 +84,15 @@
               <span>To-do</span>
               <span class="badge" id="nav-todo-count">0</span>
             </button>
+            <button class="nav-btn" type="button" data-view="pomodoro">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="13.2" r="7.8" />
+                <path d="M12 9.2v4l2.4 1.7" />
+                <path d="M9.2 2.4h5.6" />
+              </svg>
+              <span>Fokus</span>
+              <span class="badge" id="nav-pomo-count" hidden></span>
+            </button>
             <button class="nav-btn" type="button" data-view="flashcard">
               <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="2" y="6" width="20" height="14" rx="3.5" />
@@ -131,6 +141,7 @@
         <section class="view" id="view-dashboard" aria-label="Beranda"></section>
         <section class="view" id="view-collection" aria-label="Koleksi" hidden></section>
         <section class="view" id="view-todo" aria-label="Semua to-do" hidden></section>
+        <section class="view" id="view-pomodoro" aria-label="Fokus" hidden></section>
         <section class="view" id="view-flashcard" aria-label="Flashcard" hidden></section>
         <section class="view" id="view-books" aria-label="Perpustakaan" hidden></section>
       </main>
