@@ -14,6 +14,7 @@ import {
 } from './core.js';
 import { summarize, buildSummarySource } from './summary.js';
 import { rundownWidgetHTML } from './rundown.js';
+import { openGenerateDialog } from './generate.js';
 import { pomodoroWidgetHTML } from './pomodoro.js';
 
 /* =========================================================
@@ -859,5 +860,11 @@ export function initNotesEvents() {
       els.summarizeBtn.disabled = false;
       if (label) label.textContent = 'Ringkas ulang';
     }, 650);
+  });
+
+  els.generateCardsBtn.addEventListener('click', () => {
+    const ref = currentNote();
+    if (!ref) return;
+    openGenerateDialog(ref.collection, ref.note);
   });
 }

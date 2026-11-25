@@ -114,6 +114,7 @@ export const els = {
   taskProgressBar: $('#task-progress-bar'),
   summarizeBtn: $('#summarize-btn'),
   summaryOutput: $('#summary-output'),
+  generateCardsBtn: $('#generate-cards-btn'),
   collectionDialog: $('#collection-dialog'),
   collectionForm: $('#collection-form'),
   collectionDialogTitle: $('#collection-dialog-title'),

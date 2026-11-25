@@ -62,6 +62,81 @@ export function saveFcDecks() {
   } catch (e) {}
 }
 
+/* =========================================================
+   Bridge for "Buat flashcard" from notes.
+   Keeps generated cards inside the normal deck model.
+   ========================================================= */
+
+function normalizeGeneratedCard(card) {
+  if (!card) return null;
+  const q = String(card.q || '').trim().slice(0, 400);
+  const a = String(card.a || '').trim().slice(0, 800);
+  if (!q || !a) return null;
+  return {
+    id: uid(),
+    q,
+    a,
+    context: String(card.context || '').trim().slice(0, 400),
+    lastRated: null,
+  };
+}
+
+function renderAfterCardImport(deckId) {
+  if (ui.view === 'flashcard-deck' && ui.fcDeckId === deckId) {
+    renderFcDeckDetail(deckId);
+  } else if (ui.view === 'flashcard') {
+    renderFlashcard();
+  }
+}
+
+export function listFcDeckSummaries() {
+  return fcDecks.map((deck) => ({
+    id: deck.id,
+    name: deck.name,
+    theme: deck.theme,
+    count: deck.cards.length,
+  }));
+}
+
+export function addGeneratedCards(deckId, cards) {
+  const deck = getFcDeck(deckId);
+  if (!deck) return 0;
+
+  const prepared = (Array.isArray(cards) ? cards : [])
+    .map(normalizeGeneratedCard)
+    .filter(Boolean);
+
+  if (!prepared.length) return 0;
+
+  deck.cards.push(...prepared);
+  saveFcDecks();
+  renderAfterCardImport(deck.id);
+  return prepared.length;
+}
+
+export function createGeneratedDeck(name, cards) {
+  const safeName =
+    String(name || '').replace(/\s+/g, ' ').trim().slice(0, 40) || 'Flashcard';
+  const deck = {
+    id: uid(),
+    name: safeName,
+    theme: THEMES[fcDecks.length % THEMES.length] || 'ocean',
+    createdAt: Date.now(),
+    cards: [],
+  };
+
+  fcDecks.unshift(deck);
+  const added = addGeneratedCards(deck.id, cards);
+
+  if (!added) {
+    fcDecks = fcDecks.filter((item) => item !== deck);
+    saveFcDecks();
+    return { deck: null, added: 0 };
+  }
+
+  return { deck, added };
+}
+
 function getFcDeck(id) {
   return fcDecks.find((d) => d.id === id) || null;
 }
