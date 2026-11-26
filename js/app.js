@@ -23,6 +23,7 @@ import { openTutorial, initTutorialEvents, tutorialSeen } from './tutorial.js';
 import { initRundownEvents } from './rundown.js';
 import { renderBooks, initBooks } from './books.js';
 import { renderPomodoro, initPomodoro } from './pomodoro.js';
+import { renderAlarm, initAlarm } from './alarm.js';
 
 /* =========================================================
    Rendering
@@ -33,6 +34,7 @@ function renderAll() {
   els.viewCollection.hidden = ui.view !== 'collection';
   els.viewTodo.hidden = ui.view !== 'todo';
   els.viewPomodoro.hidden = ui.view !== 'pomodoro';
+  els.viewAlarm.hidden = ui.view !== 'alarm';
   els.viewFlashcard.hidden = ui.view !== 'flashcard' && ui.view !== 'flashcard-deck';
   els.viewBooks.hidden = ui.view !== 'books';
 
@@ -46,6 +48,7 @@ function renderCurrentView() {
   else if (ui.view === 'collection') renderCollection();
   else if (ui.view === 'todo') renderTodo();
   else if (ui.view === 'pomodoro') renderPomodoro();
+  else if (ui.view === 'alarm') renderAlarm();
   else if (ui.view === 'flashcard') renderFlashcard();
   else if (ui.view === 'flashcard-deck') renderFcDeckDetail(ui.fcDeckId);
   else if (ui.view === 'books') renderBooks();
@@ -57,6 +60,7 @@ function updateSearchPlaceholder() {
     collection: 'Cari catatan...',
     todo: 'Cari to-do...',
     pomodoro: 'Cari tugas...',
+    alarm: 'Cari alarm...',
     flashcard: 'Cari deck...',
     'flashcard-deck': 'Cari kartu...',
     books: 'Cari buku...',
@@ -299,6 +303,7 @@ function init() {
   initFlashcards();
   initBooks();
   initPomodoro();
+  initAlarm();
   initTutorialEvents();
   initRundownEvents();
 

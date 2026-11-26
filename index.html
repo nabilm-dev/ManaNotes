@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/books.css" />
   <link rel="stylesheet" href="css/rundown.css" />
   <link rel="stylesheet" href="css/pomodoro.css" />
+  <link rel="stylesheet" href="css/alarm.css" />
   <link rel="stylesheet" href="css/generate.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
@@ -94,6 +95,13 @@
               <span>Fokus</span>
               <span class="badge" id="nav-pomo-count" hidden></span>
             </button>
+            <button class="nav-btn" type="button" data-view="alarm">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                <path d="M10.3 21a2 2 0 0 0 3.4 0" />
+              </svg>
+              <span>Alarm</span>
+            </button>
             <button class="nav-btn" type="button" data-view="flashcard">
               <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="2" y="6" width="20" height="14" rx="3.5" />
@@ -143,6 +151,7 @@
         <section class="view" id="view-collection" aria-label="Koleksi" hidden></section>
         <section class="view" id="view-todo" aria-label="Semua to-do" hidden></section>
         <section class="view" id="view-pomodoro" aria-label="Fokus" hidden></section>
+        <section class="view" id="view-alarm" aria-label="Alarm" hidden></section>
         <section class="view" id="view-flashcard" aria-label="Flashcard" hidden></section>
         <section class="view" id="view-books" aria-label="Perpustakaan" hidden></section>
       </main>
@@ -593,6 +602,76 @@
         <button class="btn btn-primary" type="submit">Simpan</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Alarm Add/Edit Dialog -->
+  <dialog class="modal alarm-dialog" id="alarm-dialog" aria-label="Alarm harian">
+    <form id="alarm-form">
+      <header class="modal-head">
+        <div>
+          <span class="eyebrow">Alarm harian</span>
+          <h3 id="alarm-dialog-title">Alarm baru</h3>
+        </div>
+        <button class="icon-btn" id="alarm-close" type="button" aria-label="Tutup">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="al-form-row">
+        <div class="field">
+          <label for="alarm-time">Jam</label>
+          <input id="alarm-time" type="time" required />
+        </div>
+        <div class="field">
+          <label for="alarm-label">Label</label>
+          <input id="alarm-label" type="text" maxlength="40" placeholder="Bangun, istirahat, minum air..." autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="alarm-repeat">Ulangi</label>
+        <select id="alarm-repeat" class="al-select">
+          <option value="daily">Setiap hari</option>
+          <option value="weekdays">Senin–Jumat</option>
+          <option value="custom">Hari tertentu</option>
+        </select>
+      </div>
+
+      <div class="al-days" id="alarm-days" hidden>
+        <span class="field-label">Pilih hari</span>
+        <div class="al-day-grid">
+          <label class="al-day"><input type="checkbox" data-alarm-day value="1" /><span>Sen</span></label>
+          <label class="al-day"><input type="checkbox" data-alarm-day value="2" /><span>Sel</span></label>
+          <label class="al-day"><input type="checkbox" data-alarm-day value="3" /><span>Rab</span></label>
+          <label class="al-day"><input type="checkbox" data-alarm-day value="4" /><span>Kam</span></label>
+          <label class="al-day"><input type="checkbox" data-alarm-day value="5" /><span>Jum</span></label>
+          <label class="al-day"><input type="checkbox" data-alarm-day value="6" /><span>Sab</span></label>
+          <label class="al-day"><input type="checkbox" data-alarm-day value="0" /><span>Min</span></label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="alarm-delete" type="button" hidden>Hapus</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost" id="alarm-cancel" type="button">Batal</button>
+        <button class="btn btn-primary" type="submit">Simpan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Alarm Ringing -->
+  <dialog class="alarm-ring" id="alarm-ring" aria-label="Alarm berbunyi">
+    <div class="al-ring-inner">
+      <span class="al-ring-eyebrow">Alarm</span>
+      <strong class="al-ring-time" id="al-ring-time">05:00</strong>
+      <p class="al-ring-label" id="al-ring-label">Bangun</p>
+      <div class="al-ring-actions">
+        <button class="btn btn-ghost" id="alarm-snooze" type="button">Tunda 5 menit</button>
+        <button class="btn btn-primary" id="alarm-stop" type="button">Matikan</button>
+      </div>
+    </div>
   </dialog>
 
   <!-- Book PDF Reader overlay -->

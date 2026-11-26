@@ -1,0 +1,445 @@
+/* =========================================================
+   Alarm — daftar alarm harian + dialog + layar berbunyi
+   ========================================================= */
+
+/* Toolbar ------------------------------------------------- */
+
+.al-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel-soft);
+}
+
+.al-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #c9c5bd;
+  cursor: pointer;
+}
+
+.al-switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 34px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 999px;
+  background: #2c2c2a;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.al-switch input::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #8b877f;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.al-switch input:checked {
+  background: rgba(255, 106, 24, 0.35);
+}
+
+.al-switch input:checked::after {
+  transform: translateX(14px);
+  background: var(--accent-2);
+}
+
+.al-test {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 10.5px;
+}
+
+.al-hint {
+  flex: 1 1 220px;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--faint);
+  text-align: right;
+}
+
+/* Grid ---------------------------------------------------- */
+
+.al-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.al-card {
+  display: flex;
+  flex-direction: column;
+  padding: 17px 18px 14px;
+  border: 1px solid #2b2b29;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(255, 177, 92, 0.07), transparent 55%),
+    #171716;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.al-card.is-off {
+  opacity: 0.55;
+}
+
+.al-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.al-time {
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.al-toggle {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.al-toggle input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.al-toggle span {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: #2c2c2a;
+  transition: background 0.15s;
+}
+
+.al-toggle span::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 3px;
+  border-radius: 50%;
+  background: #8b877f;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.al-toggle input:checked + span {
+  background: rgba(255, 106, 24, 0.4);
+}
+
+.al-toggle input:checked + span::after {
+  transform: translateX(16px);
+  background: var(--accent-2);
+}
+
+.al-toggle input:focus-visible + span {
+  outline: 2px solid rgba(255, 177, 92, 0.5);
+  outline-offset: 2px;
+}
+
+.al-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 12px;
+}
+
+.al-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.al-repeat {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.al-next {
+  margin-top: 5px;
+  font-size: 10px;
+  color: var(--accent-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.al-card.is-off .al-next {
+  color: var(--faint);
+}
+
+.al-card-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #232322;
+}
+
+.al-edit {
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.al-edit:hover {
+  color: var(--text);
+  background: #232322;
+}
+
+/* Empty state --------------------------------------------- */
+
+.al-empty-art {
+  color: var(--accent-2);
+}
+
+.al-empty-art svg {
+  width: 46px;
+  height: 46px;
+}
+
+/* Dialog -------------------------------------------------- */
+
+.alarm-dialog {
+  width: min(440px, calc(100vw - 28px));
+}
+
+.al-form-row {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.al-select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #31312e;
+  border-radius: 11px;
+  background: #131312;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.al-select:focus {
+  outline: 2px solid rgba(255, 177, 92, 0.35);
+  outline-offset: 1px;
+}
+
+.al-days {
+  margin-bottom: 14px;
+}
+
+.al-day-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.al-day {
+  position: relative;
+  cursor: pointer;
+}
+
+.al-day input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.al-day span {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid #31312e;
+  border-radius: 10px;
+  background: #131312;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.al-day input:checked + span {
+  border-color: rgba(255, 177, 92, 0.45);
+  background: rgba(255, 106, 24, 0.16);
+  color: var(--accent-2);
+}
+
+.al-day input:focus-visible + span {
+  outline: 2px solid rgba(255, 177, 92, 0.5);
+  outline-offset: 2px;
+}
+
+/* Ringing screen ------------------------------------------ */
+
+.alarm-ring {
+  width: min(360px, calc(100vw - 28px));
+  margin: auto;
+  padding: 0;
+  border: 1px solid #3d2a1c;
+  border-radius: 30px;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(255, 177, 92, 0.22), transparent 60%),
+    radial-gradient(100% 100% at 50% 120%, rgba(255, 106, 24, 0.16), transparent 55%),
+    #141413;
+  color: var(--text);
+  box-shadow: 0 40px 120px -20px rgba(255, 106, 24, 0.28);
+  overflow: hidden;
+}
+
+.alarm-ring[open] {
+  animation: alarm-pop 0.24s ease both;
+}
+
+.alarm-ring::backdrop {
+  background: rgba(12, 10, 8, 0.62);
+  backdrop-filter: blur(10px);
+}
+
+.al-ring-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 26px 24px;
+  text-align: center;
+}
+
+.al-ring-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 106, 24, 0.16);
+  color: var(--accent-2);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.al-ring-time {
+  margin: 16px 0 4px;
+  font-size: 62px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  animation: alarm-pulse 1.2s ease-in-out infinite;
+}
+
+.al-ring-label {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e7e2d8;
+}
+
+.al-ring-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.al-ring-actions .btn {
+  flex: 1;
+  height: 44px;
+  font-size: 12px;
+}
+
+@keyframes alarm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes alarm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 0 rgba(255, 177, 92, 0);
+  }
+  50% {
+    opacity: 0.82;
+    text-shadow: 0 0 28px rgba(255, 177, 92, 0.4);
+  }
+}
+
+/* Responsive ---------------------------------------------- */
+
+@media (max-width: 720px) {
+  .al-hint {
+    flex-basis: 100%;
+    text-align: left;
+  }
+
+  .al-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .al-form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .al-ring-time {
+    font-size: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .al-ring-time,
+  .alarm-ring[open] {
+    animation: none;
+  }
+}

@@ -559,7 +559,12 @@ function handleSave(event) {
   } else {
     added = addGeneratedCards(deckValue, cards);
     if (!added) {
-      toast('Deck tujuan tidak ditemukan.');
+      const deck = listFcDeckSummaries().find((item) => item.id === deckValue);
+      toast(
+        deck
+          ? `Semua kartu itu sudah ada di "${deck.name}".`
+          : 'Deck tujuan tidak ditemukan.'
+      );
       return;
     }
     const deck = listFcDeckSummaries().find((item) => item.id === deckValue);

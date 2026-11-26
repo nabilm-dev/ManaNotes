@@ -81,6 +81,13 @@ function normalizeGeneratedCard(card) {
   };
 }
 
+function cardQuestionKey(q) {
+  return String(q || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\u00c0-\u024f]+/g, ' ')
+    .trim();
+}
+
 function renderAfterCardImport(deckId) {
   if (ui.view === 'flashcard-deck' && ui.fcDeckId === deckId) {
     renderFcDeckDetail(deckId);
@@ -108,10 +115,21 @@ export function addGeneratedCards(deckId, cards) {
 
   if (!prepared.length) return 0;
 
-  deck.cards.push(...prepared);
+  // Jangan dobel: lewati kartu yang pertanyaannya sudah ada di deck ini.
+  const existing = new Set(deck.cards.map((card) => cardQuestionKey(card.q)));
+  const fresh = prepared.filter((card) => {
+    const key = cardQuestionKey(card.q);
+    if (!key || existing.has(key)) return false;
+    existing.add(key);
+    return true;
+  });
+
+  if (!fresh.length) return 0;
+
+  deck.cards.push(...fresh);
   saveFcDecks();
   renderAfterCardImport(deck.id);
-  return prepared.length;
+  return fresh.length;
 }
 
 export function createGeneratedDeck(name, cards) {
